@@ -46,7 +46,7 @@ const ServicesPage = () => {
     <div className="min-h-screen bg-gray-50">
       {/* Header Section */}
       <div className="bg-gradient-to-r from-primary-600 to-primary-800 text-white pt-32 pb-20">
-        <div className="container-custom">
+        <div className="container-custom px-4 sm:px-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -62,9 +62,9 @@ const ServicesPage = () => {
       </div>
 
       {/* Services Grid */}
-      <div className="py-20">
-        <div className="container-custom">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+      <div className="py-10 md:py-16 lg:py-20">
+        <div className="container-custom px-4 sm:px-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10 lg:gap-12">
             {services.map((service, index) => (
               <motion.div
                 key={index}
@@ -97,8 +97,8 @@ const ServicesPage = () => {
       </div>
 
       {/* Work Atmosphere Gallery Section */}
-      <div className="py-20 bg-white">
-        <div className="container-custom">
+      <div className="py-10 md:py-16 lg:py-20 bg-white">
+        <div className="container-custom px-4 sm:px-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -113,13 +113,14 @@ const ServicesPage = () => {
               ตัวอย่างภาพบรรยากาศการทำงานจริงของทีม C&P Building Houses
             </p>
           </motion.div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 md:gap-6 lg:gap-8">
             {images.map((img, idx) => (
-              <div key={idx} className="rounded-xl overflow-hidden shadow-lg">
+              <div key={idx} className="rounded-xl overflow-hidden shadow-lg flex items-center justify-center bg-gray-50">
                 <img
                   src={img}
                   alt={`บรรยากาศการทำงาน ${idx+1}`}
-                  className="w-full h-64 object-cover hover:scale-105 transition-transform duration-300"
+                  className="w-full h-48 sm:h-56 md:h-64 lg:h-72 object-cover object-center hover:scale-105 transition-transform duration-300"
+                  style={{ maxHeight: '320px' }}
                 />
               </div>
             ))}
@@ -129,7 +130,7 @@ const ServicesPage = () => {
 
       {/* CTA Section */}
       <div className="bg-black text-white py-20">
-        <div className="container-custom">
+        <div className="container-custom px-4 sm:px-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}

@@ -7,6 +7,7 @@ import PortfolioPage from './pages/Portfolio'
 import AboutPage from './pages/About'
 import ArticlesPage from './pages/Articles'
 import ContactPage from './pages/Contact'
+import ArticleDetail from './pages/ArticleDetail'
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           <Route path="/portfolio" element={<PortfolioPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/articles" element={<ArticlesPage />} />
+          <Route path="/articles/:id" element={<ArticleDetail />} />
           <Route path="/contact" element={<ContactPage />} />
         </Routes>
       </Layout>

@@ -44,7 +44,7 @@ const ContactPage = () => {
 
       {/* Map Section */}
       <section className="py-20 bg-white">
-        <div className="container-custom">
+        <div className="container-custom px-4 sm:px-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -86,7 +86,7 @@ const ContactPage = () => {
 
       {/* FAQ Section */}
       <section className="py-20 bg-gray-50">
-        <div className="container-custom">
+        <div className="container-custom px-4 sm:px-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}

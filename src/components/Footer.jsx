@@ -45,13 +45,13 @@ const Footer = () => {
   }
 
   return (
-    <footer className="bg-secondary-900 text-white">
+    <footer className="bg-secondary-900 text-white px-4 sm:px-6">
       <div className="container-custom">
         <div className="py-16">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-10 lg:gap-12">
             
             {/* Information Column */}
-            <div>
+            <div className="mb-8">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -67,7 +67,7 @@ const Footer = () => {
             </div>
 
             {/* Quick Links Column */}
-            <div>
+            <div className="mb-8">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -90,7 +90,7 @@ const Footer = () => {
             </div>
 
             {/* Contact Column */}
-            <div>
+            <div className="mb-8">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -122,7 +122,7 @@ const Footer = () => {
             </div>
 
             {/* Newsletter Column */}
-            <div>
+            <div className="mb-8">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -171,23 +171,22 @@ const Footer = () => {
         </div>
 
         {/* Bottom Bar */}
-        <div className="border-t border-secondary-800 py-8">
+        <div className="border-t border-secondary-800 py-6 md:py-8">
           <motion.div
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
-            className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0"
+            className="flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-0 text-sm md:text-base"
           >
-            <div className="flex items-center space-x-2">
+            <div className="flex flex-wrap items-center justify-center space-x-2 text-center">
               <span className="text-gray-400">C&P Building Houses</span>
               <span className="text-primary-400">💛</span>
               <span className="text-gray-400">© {currentYear}</span>
               <span className="text-primary-400 font-medium">cpbuildinghouse</span>
               <span className="text-gray-400">สงวนลิขสิทธิ์</span>
             </div>
-            
-            <div className="flex space-x-6">
+            <div className="flex flex-wrap justify-center space-x-4 md:space-x-6">
               {socialLinks.map((social, index) => (
                 <motion.a
                   key={index}
