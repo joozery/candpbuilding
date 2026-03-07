@@ -1,67 +1,34 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
-import { Calendar, User, ArrowRight, Eye, Tag, Home } from 'lucide-react'
+import { Calendar, User, ArrowRight, Eye, Home, Loader2, AlertCircle, Search, FileText } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { articlesApi } from '../lib/api'
 
 const Articles = () => {
-  const [ref, inView] = useInView({
-    triggerOnce: true,
-    threshold: 0.1
-  })
+  const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.1 })
   const [search, setSearch] = useState('')
   const [activeCategory, setActiveCategory] = useState('all')
 
-  const articles = [
-    {
-      id: 1,
-      title: '5 เทรนด์การออกแบบบ้านยุค 2024',
-      summary: 'เทรนด์การออกแบบบ้านที่กำลังเป็นที่นิยม พร้อมแนวโน้มที่จะมาแรงในปีนี้ ตั้งแต่การใช้วัสดุธรรมชาติ จนถึงการออกแบบที่เป็นมิตรกับสิ่งแวดล้อม',
-      date: '15 มกราคม 2024',
-      author: 'ทีมสถาปนิก C&P',
-      category: 'ออกแบบ',
-      readTime: '5 นาที',
-      views: '1.2k',
-      image: 'design-trends',
-      gradient: 'from-blue-500 to-purple-600'
-    },
-    {
-      id: 2,
-      title: 'วัสดุก่อสร้างเป็นมิตรกับสิ่งแวดล้อม',
-      summary: 'รู้จักวัสดุก่อสร้างใหม่ที่ช่วยลดการปล่อยคาร์บอน และประหยัดพลังงาน พร้อมคำแนะนำในการเลือกใช้วัสดุที่เหมาะสมกับโครงการของคุณ',
-      date: '10 มกราคม 2024',
-      author: 'ทีมวิศวกร C&P',
-      category: 'วัสดุ',
-      readTime: '7 นาที',
-      views: '980',
-      image: 'eco-materials',
-      gradient: 'from-green-500 to-emerald-600'
-    },
-    {
-      id: 3,
-      title: 'เคล็ดลับการประหยัดค่าก่อสร้าง',
-      summary: 'วิธีการลดต้นทุนในการก่อสร้างโดยไม่ลดคุณภาพ ตั้งแต่การวางแผนงบประมาณ การเลือกวัสดุ จนถึงเทคนิคการก่อสร้างที่ช่วยประหยัด',
-      date: '5 มกราคม 2024',
-      author: 'ทีมโครงการ C&P',
-      category: 'เคล็ดลับ',
-      readTime: '6 นาที',
-      views: '2.1k',
-      image: 'cost-saving',
-      gradient: 'from-primary-500 to-primary-700'
-    },
-    {
-      id: 4,
-      title: 'Smart Home: บ้านอัจฉริยะยุคใหม่',
-      summary: 'เทคโนโลยีบ้านอัจฉริยะที่จะเปลี่ยนวิธีการใช้ชีวิต ตั้งแต่ระบบควบคุมแสง อุณหภูมิ การรักษาความปลอดภัย และการประหยัดพลังงาน',
-      date: '1 มกราคม 2024',
-      author: 'ทีมเทคโนโลยี C&P',
-      category: 'นวัตกรรม',
-      readTime: '8 นาที',
-      views: '1.8k',
-      image: 'smart-home',
-      gradient: 'from-purple-500 to-pink-600'
+  const [articles, setArticles] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+
+  const fetchArticles = async () => {
+    try {
+      setLoading(true)
+      const res = await articlesApi.getAll({ status: 'published' })
+      setArticles(res.data || [])
+    } catch (err) {
+      setError(err.message || 'โหลดข้อมูลไม่ได้')
+    } finally {
+      setLoading(false)
     }
-  ]
+  }
+
+  useEffect(() => {
+    fetchArticles()
+  }, [])
 
   // นับจำนวนบทความแต่ละหมวด
   const categoryCounts = articles.reduce((acc, a) => {
@@ -81,187 +48,183 @@ const Articles = () => {
     return matchSearch && matchCategory
   })
 
-  // จัดอันดับบทความล่าสุด (เรียงตามวันที่)
-  const recentArticles = [...articles].sort((a, b) => {
-    // แปลงวันที่เป็น timestamp (mock: assume dd เดือน yyyy)
-    const parseDate = d => {
-      const [day, month, year] = d.split(' ')
-      const thMonths = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม']
-      const m = thMonths.findIndex(mn => mn === month) + 1
-      return new Date(`${year}-${m.toString().padStart(2,'0')}-${day}`).getTime()
-    }
-    return parseDate(b.date) - parseDate(a.date)
-  }).slice(0, 3)
-
-  // จัดอันดับบทความยอดนิยม (เรียงตามยอดวิว)
-  const parseViews = v => Number(String(v).replace(/[^\d.]/g, ''))
-  const popularArticles = [...articles].sort((a, b) => parseViews(b.views) - parseViews(a.views)).slice(0, 3)
-
-  // Responsive: ถ้าเป็นมือถือให้แสดง recent/popular ด้านบน grid
-  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768
-
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.2
+        staggerChildren: 0.1
       }
     }
   }
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 30 },
+    hidden: { opacity: 0, y: 20 },
     visible: {
       opacity: 1,
       y: 0,
       transition: {
-        duration: 0.6,
+        duration: 0.5,
         ease: "easeOut"
       }
     }
   }
 
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 text-slate-500">
+        <AlertCircle className="w-12 h-12 mb-4 text-red-400 opacity-50" />
+        <p className="text-lg font-medium">{error}</p>
+        <button onClick={fetchArticles} className="mt-4 text-primary-600 hover:underline">ลองมใหม่อีกครั้ง</button>
+      </div>
+    )
+  }
+
   return (
-    <section className="bg-white py-10">
+    <section className="bg-white py-10 min-h-[600px]">
       <div className="max-w-7xl mx-auto px-4 flex flex-col lg:flex-row gap-8">
         {/* Main Content */}
         <div className="flex-1">
           {/* Breadcrumb + Search + Filter */}
           <div className="mb-8">
-            <nav className="mb-2 text-sm flex items-center gap-2" aria-label="breadcrumb">
+            <nav className="mb-4 text-sm flex items-center gap-2" aria-label="breadcrumb">
               <Home className="w-4 h-4 inline-block mr-1 text-primary-600" />
-              <a href="/" className="hover:underline">หน้าแรก</a>
-              <span>/</span>
-              <span className="text-secondary-700 font-medium">บทความ</span>
+              <Link to="/" className="hover:underline text-slate-500">หน้าแรก</Link>
+              <span className="text-slate-300">/</span>
+              <span className="text-slate-800 font-semibold">บทความ</span>
             </nav>
-            <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4 mb-4">
-              <input
-                type="text"
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-                placeholder="ค้นหาบทความ..."
-                className="w-full sm:w-64 px-5 py-2 rounded-full border border-gray-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 text-base text-secondary-700 placeholder-gray-400 transition-all"
-              />
-            </div>
-            <div className="flex flex-wrap gap-2 mb-6">
-              {categories.map(cat => (
-                <button
-                  key={cat}
-                  onClick={() => setActiveCategory(cat)}
-                  className={`px-4 py-2 rounded-full border font-medium text-sm transition-colors
-                    ${activeCategory === cat
-                      ? 'bg-primary-600 text-white border-primary-600 shadow'
-                      : 'bg-white text-primary-700 border-gray-200 hover:bg-primary-50 hover:text-primary-600'}
-                  `}
-                >
-                  {cat === 'all'
-                    ? `ทั้งหมด (${totalCount})`
-                    : `${cat} (${categoryCounts[cat] || 0})`}
-                </button>
-              ))}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+              <div className="flex flex-wrap gap-2">
+                {categories.map(cat => (
+                  <button
+                    key={cat}
+                    onClick={() => setActiveCategory(cat)}
+                    className={`px-4 py-1.5 rounded-full border text-sm font-medium transition-all
+                      ${activeCategory === cat
+                        ? 'bg-primary-600 text-white border-primary-600 shadow-md'
+                        : 'bg-white text-slate-600 border-slate-200 hover:border-primary-300 hover:text-primary-600'}
+                    `}
+                  >
+                    {cat === 'all'
+                      ? `ทั้งหมด (${totalCount})`
+                      : `${cat} (${categoryCounts[cat] || 0})`}
+                  </button>
+                ))}
+              </div>
+              <div className="relative group">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-primary-500 transition-colors" />
+                <input
+                  type="text"
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                  placeholder="ค้นหาบทความ..."
+                  className="w-full sm:w-64 pl-10 pr-4 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-100 focus:border-primary-500 text-sm transition-all"
+                />
+              </div>
             </div>
           </div>
-          {/* Heading + Description */}
+
+          {/* Heading */}
           <motion.div
             ref={ref}
             variants={containerVariants}
             initial="hidden"
             animate={inView ? "visible" : "hidden"}
-            className="text-center mb-16"
+            className="mb-12"
           >
-            <motion.h2 
-              variants={itemVariants}
-              className="text-4xl md:text-5xl font-bold text-secondary-800 mb-6 relative inline-block"
-            >
-              บทความและข่าวสาร
-              <span className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-16 h-1 bg-primary-600 rounded-full"></span>
-            </motion.h2>
-            <motion.p 
-              variants={itemVariants}
-              className="text-lg text-secondary-600 max-w-3xl mx-auto leading-relaxed"
-            >
-              อัพเดตเทรนด์ใหม่ เคล็ดลับการก่อสร้าง และข้อมูลเชิงลึกจากผู้เชี่ยวชาญ
-            </motion.p>
+            <motion.h2 variants={itemVariants} className="text-3xl font-bold text-slate-900 mb-2">บทความและข่าวสาร</motion.h2>
+            <motion.p variants={itemVariants} className="text-slate-500">อัปเดตเทรนด์การออกแบบ เคล็ดลับ และข่าวสารล่าสุดจากทีมงาน C&P Building</motion.p>
           </motion.div>
-          {/* Articles List */}
-          <motion.div
-            ref={ref}
-            variants={containerVariants}
-            initial="hidden"
-            animate={inView ? "visible" : "hidden"}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
-          >
-            {filteredArticles.length === 0 ? (
-              <div className="col-span-full text-center text-secondary-500 py-12 text-lg">ไม่พบผลลัพธ์ที่ตรงกับ "{search}"</div>
-            ) : (
-              filteredArticles.map((article, index) => (
-                <motion.article
-                  key={article.id}
-                  variants={itemVariants}
-                  className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 group"
-                >
-                  {/* Article Image */}
-                  <div className={`relative h-48 bg-gradient-to-br ${article.gradient} flex items-center justify-center overflow-hidden`}>
-                    <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors duration-300"></div>
-                    <div className="relative z-10 text-white text-center">
-                      <div className="w-16 h-16 mx-auto mb-2 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
-                        <Calendar className="w-8 h-8" />
-                      </div>
-                      <span className="text-sm font-medium">{article.category}</span>
-                    </div>
-                    {/* Category Badge */}
-                    <div className="absolute top-4 left-4 bg-primary-600 text-white px-3 py-1 rounded-full text-xs font-medium">
-                      {article.category}
-                    </div>
-                  </div>
-                  {/* Article Content */}
-                  <div className="p-6">
-                    {/* Meta Info */}
-                    <div className="flex items-center justify-between text-xs text-secondary-500 mb-3">
-                      <div className="flex items-center space-x-4">
-                        <span className="flex items-center">
-                          <Calendar className="w-3 h-3 mr-1" />
-                          {article.date}
-                        </span>
-                        <span className="flex items-center">
-                          <Eye className="w-3 h-3 mr-1" />
-                          {article.views}
+
+          {/* Articles Grid */}
+          {loading ? (
+            <div className="flex flex-col items-center justify-center py-20 text-slate-400">
+              <Loader2 className="w-8 h-8 animate-spin mb-4" />
+              <p>กำลังโหลดบทความ...</p>
+            </div>
+          ) : (
+            <motion.div
+              variants={containerVariants}
+              initial="hidden"
+              animate={inView ? "visible" : "hidden"}
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+            >
+              {filteredArticles.length === 0 ? (
+                <div className="col-span-full text-center text-slate-400 py-16">
+                  <p className="text-lg">ไม่พบบทความที่คุณค้นหา</p>
+                </div>
+              ) : (
+                filteredArticles.map((article) => (
+                  <motion.article
+                    key={article._id}
+                    variants={itemVariants}
+                    className="bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden group"
+                  >
+                    {/* Image / Gradient */}
+                    <Link to={`/articles/${article._id}`} className="block relative aspect-[4/3] overflow-hidden">
+                      {article.image?.url ? (
+                        <img
+                          src={article.image.url}
+                          alt={article.title}
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                        />
+                      ) : (
+                        <div className={`w-full h-full bg-gradient-to-br ${article.gradient || 'from-slate-100 to-slate-200'} flex items-center justify-center p-8`}>
+                          <FileText className="w-12 h-12 text-white/50" />
+                        </div>
+                      )}
+                      <div className="absolute top-3 left-3">
+                        <span className="bg-white/90 backdrop-blur-sm text-primary-700 px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider shadow-sm">
+                          {article.category}
                         </span>
                       </div>
-                      <span>{article.readTime}</span>
-                    </div>
-                    {/* Title */}
-                    <h3 className="text-lg font-semibold text-secondary-800 mb-3 line-clamp-2 group-hover:text-primary-600 transition-colors duration-300">
-                      {article.title}
-                    </h3>
-                    {/* Summary */}
-                    <p className="text-secondary-600 text-sm leading-relaxed mb-4 line-clamp-3">
-                      {article.summary}
-                    </p>
-                    {/* Author & Read More */}
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center text-xs text-secondary-500">
-                        <User className="w-3 h-3 mr-1" />
-                        <span>{article.author}</span>
+                    </Link>
+
+                    {/* Content */}
+                    <div className="p-5">
+                      <div className="flex items-center gap-3 text-[10px] text-slate-400 mb-3">
+                        <span className="flex items-center gap-1">
+                          <Calendar className="w-3 h-3" />
+                          {new Date(article.createdAt).toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' })}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Eye className="w-3 h-3" />
+                          {article.views?.toLocaleString() || '0'}
+                        </span>
                       </div>
-                      <Link
-                        to={`/articles/${article.id}`}
-                        className="flex items-center text-primary-600 hover:text-primary-700 text-sm font-medium group-hover:translate-x-1 transition-all duration-300"
-                      >
-                        อ่านต่อ
-                        <ArrowRight className="w-4 h-4 ml-1" />
+                      <Link to={`/articles/${article._id}`}>
+                        <h3 className="text-base font-bold text-slate-800 line-clamp-2 mb-2 group-hover:text-primary-600 transition-colors leading-snug">
+                          {article.title}
+                        </h3>
                       </Link>
+                      <p className="text-slate-500 text-xs line-clamp-2 mb-5 leading-relaxed">
+                        {article.summary}
+                      </p>
+
+                      <div className="flex items-center justify-between pt-4 border-t border-slate-50">
+                        <div className="flex items-center gap-2">
+                          <div className="w-6 h-6 rounded-full bg-primary-50 flex items-center justify-center text-primary-600">
+                            <User className="w-3 h-3" />
+                          </div>
+                          <span className="text-[10px] font-medium text-slate-600">{article.author}</span>
+                        </div>
+                        <Link
+                          to={`/articles/${article._id}`}
+                          className="flex items-center gap-1 text-xs font-bold text-primary-600 hover:text-primary-700 transition-colors"
+                        >
+                          อ่านต่อ <ArrowRight className="w-3 h-3" />
+                        </Link>
+                      </div>
                     </div>
-                  </div>
-                </motion.article>
-              ))
-            )}
-          </motion.div>
+                  </motion.article>
+                ))
+              )}
+            </motion.div>
+          )}
         </div>
       </div>
     </section>
   )
 }
 
-export default Articles 
+export default Articles

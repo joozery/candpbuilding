@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 import { ChevronDown } from 'lucide-react'
 import { motion } from 'framer-motion'
 import heroBg from '../assets/herobg.jpg'
@@ -36,8 +37,8 @@ const Hero = () => {
   }
 
   return (
-    <section 
-      id="hero" 
+    <section
+      id="hero"
       className="relative min-h-screen flex items-center justify-center overflow-hidden"
       style={{
         backgroundImage: `url(${heroBg})`,
@@ -48,7 +49,7 @@ const Hero = () => {
     >
       {/* Background Overlay for better text readability */}
       <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-black/70"></div>
-      
+
       {/* Geometric Background Pattern */}
       <div className="absolute inset-0 opacity-20">
         <div className="absolute top-20 left-20 w-32 h-32 border-l-4 border-t-4 border-gray-300 transform rotate-45"></div>
@@ -56,31 +57,31 @@ const Hero = () => {
         <div className="absolute bottom-32 left-1/4 w-20 h-20 border border-gray-300 transform rotate-12"></div>
         <div className="absolute top-1/3 right-1/4 w-16 h-16 border-2 border-gray-400 transform rotate-45"></div>
       </div>
-      
-             {/* Main Geometric Shapes - adjusted for background image */}
-       <div className="absolute right-0 top-0 w-1/2 h-full overflow-hidden">
-         {/* Large Gold Shape */}
-         <motion.div 
-           initial={{ x: 100, opacity: 0 }}
-           animate={{ x: 0, opacity: 0.6 }}
-           transition={{ duration: 1.2, delay: 0.3 }}
-           className="absolute -right-32 top-1/4 w-96 h-96 bg-gradient-to-br from-primary-400/80 to-primary-700/80 transform rotate-45 backdrop-blur-sm"
-         ></motion.div>
-         {/* Secondary Shape */}
-         <motion.div 
-           initial={{ x: 150, opacity: 0 }}
-           animate={{ x: 0, opacity: 0.5 }}
-           transition={{ duration: 1.4, delay: 0.6 }}
-           className="absolute -right-16 top-1/2 w-64 h-64 bg-gradient-to-br from-primary-500/70 to-primary-600/70 transform rotate-12 backdrop-blur-sm"
-         ></motion.div>
-         {/* Small Accent Shape */}
-         <motion.div 
-           initial={{ x: 80, opacity: 0 }}
-           animate={{ x: 0, opacity: 0.6 }}
-           transition={{ duration: 1, delay: 0.9 }}
-           className="absolute right-24 top-1/3 w-32 h-32 bg-primary-400/70 transform -rotate-12 backdrop-blur-sm"
-         ></motion.div>
-       </div>
+
+      {/* Main Geometric Shapes - adjusted for background image */}
+      <div className="absolute right-0 top-0 w-1/2 h-full overflow-hidden">
+        {/* Large Gold Shape */}
+        <motion.div
+          initial={{ x: 100, opacity: 0 }}
+          animate={{ x: 0, opacity: 0.6 }}
+          transition={{ duration: 1.2, delay: 0.3 }}
+          className="absolute -right-32 top-1/4 w-96 h-96 bg-gradient-to-br from-primary-400/80 to-primary-700/80 transform rotate-45 backdrop-blur-sm"
+        ></motion.div>
+        {/* Secondary Shape */}
+        <motion.div
+          initial={{ x: 150, opacity: 0 }}
+          animate={{ x: 0, opacity: 0.5 }}
+          transition={{ duration: 1.4, delay: 0.6 }}
+          className="absolute -right-16 top-1/2 w-64 h-64 bg-gradient-to-br from-primary-500/70 to-primary-600/70 transform rotate-12 backdrop-blur-sm"
+        ></motion.div>
+        {/* Small Accent Shape */}
+        <motion.div
+          initial={{ x: 80, opacity: 0 }}
+          animate={{ x: 0, opacity: 0.6 }}
+          transition={{ duration: 1, delay: 0.9 }}
+          className="absolute right-24 top-1/3 w-32 h-32 bg-primary-400/70 transform -rotate-12 backdrop-blur-sm"
+        ></motion.div>
+      </div>
 
       {/* Content */}
       <motion.div
@@ -91,7 +92,7 @@ const Hero = () => {
       >
         {/* Left Content */}
         <div className="space-y-8">
-          <motion.h1 
+          <motion.h1
             variants={itemVariants}
             className="text-4xl md:text-6xl lg:text-7xl font-bold leading-tight"
           >
@@ -101,21 +102,21 @@ const Hero = () => {
             <br />
             <span className="text-primary-400">ให้เป็นจริง</span>
           </motion.h1>
-          
-          <motion.p 
+
+          <motion.p
             variants={itemVariants}
             className="text-lg md:text-xl leading-relaxed text-gray-300 max-w-lg"
           >
-            C&P Building Houses คือผู้เชี่ยวชาญด้านการก่อสร้างและสถาปัตยกรรม 
+            C&P Building Houses คือผู้เชี่ยวชาญด้านการก่อสร้างและสถาปัตยกรรม
             ที่มีความรับผิดชิดเป็นมิตรกับสิ่งแวดล้อมมากที่สุดสำหรับทุกรูปแบบโครงการ
           </motion.p>
-          
-          <motion.div 
+
+          <motion.div
             variants={itemVariants}
             className="flex flex-col sm:flex-row gap-6"
           >
-            <button 
-              onClick={() => scrollToSection('contact')}
+            <Link
+              to="/contact"
               className="group relative bg-primary-500 hover:bg-primary-600 text-white font-semibold px-8 py-4 text-lg flex items-center justify-center transition-all duration-300 transform hover:scale-105 shadow-lg shadow-primary-500/30"
               style={{
                 clipPath: 'polygon(0 0, calc(100% - 20px) 0, 100% 100%, 0 100%)'
@@ -123,20 +124,20 @@ const Hero = () => {
             >
               เริ่มปรึกษา
               <span className="ml-2 text-xl">→</span>
-            </button>
-            
-            <button 
-              onClick={() => scrollToSection('portfolio')}
-              className="border-2 border-white text-white hover:bg-white hover:text-slate-900 font-semibold px-8 py-4 text-lg transition-all duration-300"
+            </Link>
+
+            <Link
+              to="/portfolio"
+              className="border-2 border-white text-white hover:bg-white hover:text-slate-900 font-semibold px-8 py-4 text-lg transition-all duration-300 flex items-center justify-center"
             >
               ดูผลงาน
-            </button>
+            </Link>
           </motion.div>
         </div>
 
         {/* Statistics Cards */}
         <div className="lg:hidden mt-12">
-          <motion.div 
+          <motion.div
             variants={itemVariants}
             className="grid grid-cols-3 gap-4"
           >
@@ -157,7 +158,7 @@ const Hero = () => {
 
         {/* Right Side - Desktop Statistics */}
         <div className="hidden lg:block">
-          <motion.div 
+          <motion.div
             variants={itemVariants}
             className="space-y-6"
           >
@@ -196,4 +197,4 @@ const Hero = () => {
   )
 }
 
-export default Hero 
+export default Hero

@@ -1,7 +1,9 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
-import { Home, Building, Wrench, Warehouse } from 'lucide-react'
+import { Home, Building, Wrench, Warehouse, Loader2, MapPin, Calendar, ArrowRight } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { portfolioApi } from '../lib/api'
 
 const Portfolio = () => {
   const [ref, inView] = useInView({
@@ -10,68 +12,31 @@ const Portfolio = () => {
   })
 
   const [activeFilter, setActiveFilter] = useState('all')
+  const [items, setItems] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
-  const filters = [
-    { id: 'all', label: 'ทั้งหมด' },
-    { id: 'residential', label: 'บ้านพักอาศัย' },
-    { id: 'commercial', label: 'อาคารพาณิชย์' },
-    { id: 'renovation', label: 'ปรับปรุง' }
-  ]
-
-  const portfolioItems = [
-    {
-      id: 1,
-      title: 'บ้านเดี่ยวสไตล์โมเดิร์น',
-      description: 'บ้านเดี่ยว 2 ชั้น พื้นที่ 250 ตร.ม.',
-      category: 'residential',
-      icon: <Home className="w-12 h-12 text-white" />,
-      gradient: 'bg-gradient-to-br from-primary-500 to-primary-700'
-    },
-    {
-      id: 2,
-      title: 'อาคารสำนักงาน',
-      description: 'อาคารสำนักงาน 4 ชั้น ย่านธุรกิจ',
-      category: 'commercial',
-      icon: <Building className="w-12 h-12 text-white" />,
-      gradient: 'bg-gradient-to-br from-secondary-600 to-secondary-800'
-    },
-    {
-      id: 3,
-      title: 'ปรับปรุงบ้านเก่า',
-      description: 'รีโนเวทบ้านเก่า 30 ปี ให้ดูใหม่',
-      category: 'renovation',
-      icon: <Wrench className="w-12 h-12 text-white" />,
-      gradient: 'bg-gradient-to-br from-accent-500 to-accent-700'
-    },
-    {
-      id: 4,
-      title: 'บ้านสไตล์ลอฟท์',
-      description: 'บ้านสไตล์อุตสาหกรรม ดีไซน์ทันสมัย',
-      category: 'residential',
-      icon: <Warehouse className="w-12 h-12 text-white" />,
-      gradient: 'bg-gradient-to-br from-primary-600 to-accent-600'
-    },
-    {
-      id: 5,
-      title: 'ศูนย์การค้าชุมชน',
-      description: 'ศูนย์การค้าขนาดกลาง 3 ชั้น',
-      category: 'commercial',
-      icon: <Building className="w-12 h-12 text-white" />,
-      gradient: 'bg-gradient-to-br from-gold-600 to-gold-800'
-    },
-    {
-      id: 6,
-      title: 'ต่อเติมบ้านชั้น 2',
-      description: 'เพิ่มพื้นที่ใช้สอย ชั้น 2 ครบครัน',
-      category: 'renovation',
-      icon: <Home className="w-12 h-12 text-white" />,
-      gradient: 'bg-gradient-to-br from-primary-400 to-secondary-600'
+  const fetchPortfolio = async () => {
+    try {
+      setLoading(true)
+      const res = await portfolioApi.getAll({ status: 'active' })
+      setItems(res.data || [])
+    } catch (err) {
+      setError(err.message || 'โหลดข้อมูลผลงานไม่สำเร็จ')
+    } finally {
+      setLoading(false)
     }
-  ]
+  }
 
-  const filteredItems = activeFilter === 'all' 
-    ? portfolioItems 
-    : portfolioItems.filter(item => item.category === activeFilter)
+  useEffect(() => {
+    fetchPortfolio()
+  }, [])
+
+  const categories = ['all', ...new Set(items.map(item => item.category))]
+
+  const filteredItems = activeFilter === 'all'
+    ? items
+    : items.filter(item => item.category === activeFilter)
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -96,8 +61,8 @@ const Portfolio = () => {
   }
 
   return (
-    <section id="portfolio" className="section-padding">
-      <div className="container-custom">
+    <section id="portfolio" className="bg-white py-16 min-h-[600px]">
+      <div className="max-w-7xl mx-auto px-4">
         <motion.div
           ref={ref}
           variants={containerVariants}
@@ -105,78 +70,125 @@ const Portfolio = () => {
           animate={inView ? "visible" : "hidden"}
           className="text-center mb-16"
         >
-          <motion.h2 
+          <motion.h2
             variants={itemVariants}
-            className="text-4xl md:text-5xl font-bold text-secondary-800 mb-6 relative inline-block"
+            className="text-4xl md:text-5xl font-bold text-slate-900 mb-6 relative inline-block"
           >
-            ผลงานของเรา
+            ผลงานที่โดดเด่น
             <span className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-16 h-1 bg-primary-600 rounded-full"></span>
           </motion.h2>
-          <motion.p 
+          <motion.p
             variants={itemVariants}
-            className="text-lg text-secondary-600 max-w-3xl mx-auto leading-relaxed"
+            className="text-slate-500 max-w-2xl mx-auto text-lg"
           >
-            ความภาคภูมิใจในทุกโครงการที่ได้สร้างสรรค์ ด้วยคุณภาพและความเป็นเลิศ
+            จากความตั้งใจสู่ผลลัพธ์ที่จับต้องได้ ทุกโครงการคือเครื่องพิสูจน์คุณภาพงานก่อสร้างของ C&P Building
           </motion.p>
         </motion.div>
 
         {/* Filter Buttons */}
-        <motion.div 
+        <motion.div
           variants={containerVariants}
           initial="hidden"
           animate={inView ? "visible" : "hidden"}
-          className="flex flex-wrap justify-center gap-4 mb-12"
+          className="flex flex-wrap justify-center gap-3 mb-12"
         >
-          {filters.map((filter) => (
+          {categories.map((cat) => (
             <motion.button
-              key={filter.id}
+              key={cat}
               variants={itemVariants}
-              onClick={() => setActiveFilter(filter.id)}
-              className={`px-6 py-3 rounded-full font-medium transition-all duration-300 ${
-                activeFilter === filter.id
-                  ? 'bg-primary-600 text-white shadow-lg'
-                  : 'bg-white text-secondary-600 hover:bg-primary-50 hover:text-primary-600 border-2 border-gray-200'
-              }`}
+              onClick={() => setActiveFilter(cat)}
+              className={`px-6 py-2.5 rounded-full font-bold text-sm transition-all duration-300 border-2 ${activeFilter === cat
+                  ? 'bg-primary-600 text-white border-primary-600 shadow-lg shadow-primary-500/20'
+                  : 'bg-white text-slate-500 border-slate-100 hover:border-primary-200 hover:text-primary-600'
+                }`}
             >
-              {filter.label}
+              {cat === 'all' ? 'ทั้งหมด' : cat}
             </motion.button>
           ))}
         </motion.div>
 
         {/* Portfolio Grid */}
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate={inView ? "visible" : "hidden"}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-        >
-          {filteredItems.map((item) => (
-            <motion.div
-              key={item.id}
-              variants={itemVariants}
-              layout
-              className="portfolio-card group"
-            >
-              <div className={`relative h-64 ${item.gradient} flex items-center justify-center overflow-hidden`}>
-                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors duration-300"></div>
-                <div className="relative z-10 group-hover:scale-110 transition-transform duration-300">
-                  {item.icon}
-                </div>
-                
-                {/* Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
-                  <div className="p-6 text-white">
-                    <h4 className="text-lg font-semibold mb-2">{item.title}</h4>
-                    <p className="text-sm text-gray-200">{item.description}</p>
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-24 text-slate-400">
+            <Loader2 className="w-10 h-10 animate-spin text-primary-500 mb-4" />
+            <p className="font-medium">กำลังโหลดผลงานความภาคภูมิใจของเรา...</p>
+          </div>
+        ) : error ? (
+          <div className="text-center py-20">
+            <p className="text-red-500 font-medium mb-4">{error}</p>
+            <button onClick={fetchPortfolio} className="text-primary-600 hover:underline">ลองใหม่อีกครั้ง</button>
+          </div>
+        ) : filteredItems.length === 0 ? (
+          <div className="text-center py-20 text-slate-400">
+            <p>ขออภัย ไม่พบผลงานในหมวดหมู่นี้</p>
+          </div>
+        ) : (
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate={inView ? "visible" : "hidden"}
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+          >
+            {filteredItems.map((item) => (
+              <motion.div
+                key={item._id}
+                variants={itemVariants}
+                layout
+                className="group bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-sm hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2"
+              >
+                <Link to={`/portfolio/${item._id}`} className="block relative aspect-[4/3] overflow-hidden">
+                  {item.images?.length > 0 ? (
+                    <img
+                      src={item.images[0].url}
+                      alt={item.title}
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-slate-100 flex items-center justify-center">
+                      <Warehouse className="w-12 h-12 text-slate-300" />
+                    </div>
+                  )}
+
+                  {/* Overlay on hover */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-8 text-white">
+                    <div className="transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                      <span className="inline-block px-3 py-1 bg-primary-600 rounded-lg text-[10px] font-bold uppercase tracking-widest mb-3 shadow-lg">
+                        {item.category}
+                      </span>
+                      <h3 className="text-xl font-bold mb-2">{item.title}</h3>
+                      <p className="text-white/70 text-sm line-clamp-2 mb-4 leading-relaxed">{item.description}</p>
+                      <span className="flex items-center gap-2 text-primary-400 font-bold text-sm">
+                        ดูรายละเอียดโครงการ <ArrowRight className="w-4 h-4" />
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+
+                {/* Bottom Info (Visible) */}
+                <div className="p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="text-[10px] font-bold text-primary-600 bg-primary-50 px-2 py-1 rounded-md uppercase tracking-wider">
+                      {item.category}
+                    </span>
+                    <span className="text-xs text-slate-400 font-medium">Project ID #CPB{item._id.slice(-4)}</span>
+                  </div>
+                  <h4 className="text-lg font-bold text-slate-800 mb-4 group-hover:text-primary-600 transition-colors line-clamp-1">{item.title}</h4>
+                  <div className="flex items-center gap-4 border-t border-slate-50 pt-4">
+                    <div className="flex items-center gap-1.5 text-xs text-slate-500">
+                      <MapPin className="w-3.5 h-3.5 text-primary-500" /> {item.location || 'ไม่ระบุสถานที่'}
+                    </div>
+                    <div className="flex items-center gap-1.5 text-xs text-slate-500">
+                      <Calendar className="w-3.5 h-3.5 text-primary-500" /> {item.year || '2024'}
+                    </div>
                   </div>
                 </div>
-              </div>
-            </motion.div>
-          ))}
-        </motion.div>
+              </motion.div>
+            ))}
+          </motion.div>
+        )}
       </div>
     </section>
   )
 }
 
-export default Portfolio 
+export default Portfolio

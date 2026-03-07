@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
-import { MapPin, Phone, Mail, Clock, Send, CheckCircle } from 'lucide-react'
+import { MapPin, Phone, Mail, Clock, Send, CheckCircle, AlertCircle } from 'lucide-react'
+import { contactsApi } from '../lib/api'
 
 const Contact = () => {
   const [ref, inView] = useInView({
@@ -54,23 +55,26 @@ const Contact = () => {
     e.preventDefault()
     setIsSubmitting(true)
 
-    // Simulate form submission
-    await new Promise(resolve => setTimeout(resolve, 1500))
-    
-    setIsSubmitting(false)
-    setIsSubmitted(true)
-    
-    // Reset form after success
-    setTimeout(() => {
-      setFormData({
-        name: '',
-        phone: '',
-        email: '',
-        service: '',
-        message: ''
-      })
-      setIsSubmitted(false)
-    }, 3000)
+    try {
+      await contactsApi.submit(formData)
+      setIsSubmitted(true)
+
+      // Reset form after success
+      setTimeout(() => {
+        setFormData({
+          name: '',
+          phone: '',
+          email: '',
+          service: '',
+          message: ''
+        })
+        setIsSubmitted(false)
+      }, 4000)
+    } catch (err) {
+      alert('ขออภัย! ไม่สามารถส่งข้อความได้ในขณะนี้: ' + err.message)
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const containerVariants = {
@@ -105,14 +109,14 @@ const Contact = () => {
           animate={inView ? "visible" : "hidden"}
           className="text-center mb-16"
         >
-          <motion.h2 
+          <motion.h2
             variants={itemVariants}
             className="text-4xl md:text-5xl font-bold text-secondary-800 mb-6 relative inline-block"
           >
             ติดต่อเรา
             <span className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-16 h-1 bg-primary-600 rounded-full"></span>
           </motion.h2>
-          <motion.p 
+          <motion.p
             variants={itemVariants}
             className="text-lg text-secondary-600 max-w-3xl mx-auto leading-relaxed"
           >
@@ -237,11 +241,10 @@ const Contact = () => {
               <button
                 type="submit"
                 disabled={isSubmitting || isSubmitted}
-                className={`w-full py-4 px-6 rounded-lg font-medium transition-all duration-300 ${
-                  isSubmitted 
-                    ? 'bg-green-600 text-white' 
+                className={`w-full py-4 px-6 rounded-lg font-medium transition-all duration-300 ${isSubmitted
+                    ? 'bg-green-600 text-white'
                     : 'btn btn-primary'
-                } ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
+                  } ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
               >
                 {isSubmitting ? (
                   <div className="flex items-center justify-center">

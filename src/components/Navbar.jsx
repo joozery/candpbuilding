@@ -22,22 +22,22 @@ const Navbar = () => {
     { label: 'หน้าแรก', path: '/' },
     { label: 'บริการ', path: '/services' },
     { label: 'ผลงาน', path: '/portfolio' },
+    { label: 'แกลลอรี่', path: '/gallery' },
     { label: 'เกี่ยวกับเรา', path: '/about' },
     { label: 'บทความ', path: '/articles' },
     { label: 'ติดต่อ', path: '/contact' }
   ]
 
   return (
-    <nav className={`fixed w-full z-50 transition-all duration-300 ${
-      isScrolled ? 'bg-white/95 backdrop-blur-md shadow-lg' : 'bg-white/90 backdrop-blur-md'
-    }`}>
+    <nav className={`fixed w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-white/95 backdrop-blur-md shadow-lg' : 'bg-white/90 backdrop-blur-md'
+      }`}>
       <div className="container-custom px-4 sm:px-6">
         <div className="flex items-center justify-between py-4">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-3 cursor-pointer">
-            <img 
-              src={logo} 
-              alt="C&P Building Houses Logo" 
+            <img
+              src={logo}
+              alt="C&P Building Houses Logo"
               className="w-12 h-12 object-contain hover:scale-105 transition-transform duration-300"
             />
             <div className="flex flex-col">
@@ -56,14 +56,12 @@ const Navbar = () => {
               <Link
                 key={item.path}
                 to={item.path}
-                className={`text-secondary-700 hover:text-primary-600 transition-colors font-medium relative group ${
-                  location.pathname === item.path ? 'text-primary-600' : ''
-                }`}
+                className={`text-secondary-700 hover:text-primary-600 transition-colors font-medium relative group ${location.pathname === item.path ? 'text-primary-600' : ''
+                  }`}
               >
                 {item.label}
-                <span className={`absolute bottom-0 left-0 h-0.5 bg-primary-600 transition-all duration-300 group-hover:w-full ${
-                  location.pathname === item.path ? 'w-full' : 'w-0'
-                }`}></span>
+                <span className={`absolute bottom-0 left-0 h-0.5 bg-primary-600 transition-all duration-300 group-hover:w-full ${location.pathname === item.path ? 'w-full' : 'w-0'
+                  }`}></span>
               </Link>
             ))}
           </div>
@@ -86,9 +84,8 @@ const Navbar = () => {
                   key={item.path}
                   to={item.path}
                   onClick={() => setIsMenuOpen(false)}
-                  className={`block w-full text-left px-6 py-3 text-secondary-700 hover:text-primary-600 hover:bg-secondary-50 transition-colors ${
-                    location.pathname === item.path ? 'text-primary-600 bg-secondary-50' : ''
-                  }`}
+                  className={`block w-full text-left px-6 py-3 text-secondary-700 hover:text-primary-600 hover:bg-secondary-50 transition-colors ${location.pathname === item.path ? 'text-primary-600 bg-secondary-50' : ''
+                    }`}
                 >
                   {item.label}
                 </Link>
