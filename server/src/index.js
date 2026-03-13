@@ -10,6 +10,7 @@ import uploadRoutes from './routes/upload.js'
 import contactRoutes from './routes/contacts.js'
 import authRoutes from './routes/auth.js'
 import userRoutes from './routes/users.js'
+import settingsRoutes from './routes/settings.js'
 
 const app = express()
 const PORT = process.env.PORT || 5000
@@ -30,6 +31,7 @@ app.use('/api/upload', uploadRoutes)
 app.use('/api/contacts', contactRoutes)
 app.use('/api/auth', authRoutes)
 app.use('/api/users', userRoutes)
+app.use('/api/settings', settingsRoutes)
 
 // ---- Health Check ---- //
 app.get('/api/health', (req, res) => {

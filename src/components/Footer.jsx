@@ -2,11 +2,26 @@ import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Globe, MessageCircle, Camera, Phone, Mail, MapPin, Send } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { settingsApi } from '../lib/api'
+import { useEffect } from 'react'
 
 const Footer = () => {
   const currentYear = new Date().getFullYear()
   const [email, setEmail] = useState('')
   const [isSubscribed, setIsSubscribed] = useState(false)
+  const [settings, setSettings] = useState(null)
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const data = await settingsApi.get()
+        setSettings(data)
+      } catch (err) {
+        console.error('Failed to fetch settings:', err)
+      }
+    }
+    fetchSettings()
+  }, [])
 
   const socialLinks = [
     {
@@ -102,20 +117,18 @@ const Footer = () => {
                   <div className="flex items-start space-x-3">
                     <MapPin className="w-5 h-5 text-primary-400 flex-shrink-0 mt-1" />
                     <div>
-                      <p className="text-gray-400">781/45 ชั้นที่ 8 ห้องเลขที่ 3A8</p>
-                      <p className="text-gray-400">หมู่บ้าน ปัญญารีสอร์ท หมู่ที่ 10</p>
-                      <p className="text-gray-400">ตำบลบางพระ อำเภอศรีราชา จ.ชลบุรี</p>
+                      <p className="text-gray-400 whitespace-pre-line">{settings?.address || '781/45 ชั้นที่ 8 ห้องเลขที่ 3A8\nหมู่บ้าน ปัญญารีสอร์ท หมู่ที่ 10\nตำบลบางพระ อำเภอศรีราชา จ.ชลบุรี'}</p>
                     </div>
                   </div>
                   
                   <div className="flex items-center space-x-3">
                     <Phone className="w-5 h-5 text-primary-400 flex-shrink-0" />
-                    <span className="text-gray-400">02-123-4567</span>
+                    <span className="text-gray-400">{settings?.phone || '02-123-4567'}</span>
                   </div>
                   
                   <div className="flex items-center space-x-3">
                     <Mail className="w-5 h-5 text-primary-400 flex-shrink-0" />
-                    <span className="text-gray-400">info@cpbuildinghouse.com</span>
+                    <span className="text-gray-400">{settings?.email || 'info@cpbuildinghouse.com'}</span>
                   </div>
                 </div>
               </motion.div>

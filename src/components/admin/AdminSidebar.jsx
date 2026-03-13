@@ -11,12 +11,14 @@ import {
     Building2,
     ChevronRight,
     MessageSquare,
-    ShieldCheck
+    ShieldCheck,
+    Layout
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const menuItems = [
     { icon: LayoutDashboard, label: 'แดชบอร์ด', path: '/admin', badge: null },
+    { icon: Layout, label: 'จัดการหน้าแรก', path: '/admin/hero', badge: null },
     { icon: FileText, label: 'จัดการบทความ', path: '/admin/articles', badge: '3' },
     { icon: MessageSquare, label: 'ข้อความติดต่อ', path: '/admin/inquiries', badge: null },
     { icon: ShieldCheck, label: 'จัดการแอดมิน', path: '/admin/users', badge: null },

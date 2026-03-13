@@ -1,10 +1,12 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Save, Globe, Phone, Mail, MapPin, Facebook, Youtube, Building2, RefreshCw } from 'lucide-react'
+import { Save, Globe, Phone, Mail, MapPin, Facebook, Youtube, Building2, RefreshCw, Loader2, Image as ImageIcon, Upload, X } from 'lucide-react'
+import { settingsApi, uploadApi } from '@/lib/api'
 
 // ---- Section Wrapper ---- //
+// ... (rest of the helper components keep as is)
 function SettingSection({ title, description, children }) {
     return (
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
@@ -58,28 +60,63 @@ function SaveToast({ visible }) {
 // ---- Main ---- //
 export default function AdminSettings() {
     const [settings, setSettings] = useState({
-        siteName: 'C&P Building',
-        siteTagline: 'สร้างบ้านและก่อสร้างอย่างมืออาชีพ',
-        siteUrl: 'https://cpbuilding.com',
-        phone: '02-xxx-xxxx',
-        email: 'contact@cpbuilding.com',
-        address: '123 ถ.สุขุมวิท กรุงเทพฯ 10110',
-        facebookUrl: 'https://facebook.com/cpbuilding',
+        siteName: '',
+        siteTagline: '',
+        siteUrl: '',
+        phone: '',
+        email: '',
+        address: '',
+        facebookUrl: '',
         youtubeUrl: '',
         lineUrl: '',
-        articlesPerPage: '9',
+        articlesPerPage: 9,
         enableComments: false,
         maintenanceMode: false,
-        seoTitle: 'C&P Building | รับสร้างบ้านและก่อสร้าง',
-        seoDesc: 'รับสร้างบ้าน ออกแบบบ้าน และงานก่อสร้างทุกประเภทด้วยทีมงานมืออาชีพ',
+        seoTitle: '',
+        seoDesc: '',
     })
+    const [loading, setLoading] = useState(true)
+    const [saving, setSaving] = useState(false)
+    const [uploading, setUploading] = useState(false)
     const [toast, setToast] = useState(false)
+
+    useEffect(() => {
+        fetchSettings()
+    }, [])
+
+    const fetchSettings = async () => {
+        try {
+            const data = await settingsApi.get()
+            setSettings(data)
+        } catch (err) {
+            console.error('Failed to fetch settings:', err)
+        } finally {
+            setLoading(false)
+        }
+    }
 
     const set = (key, val) => setSettings(p => ({ ...p, [key]: val }))
 
-    const handleSave = () => {
-        setToast(true)
-        setTimeout(() => setToast(false), 2500)
+    const handleSave = async () => {
+        setSaving(true)
+        try {
+            await settingsApi.update(settings)
+            setToast(true)
+            setTimeout(() => setToast(false), 2500)
+        } catch (err) {
+            console.error('Failed to save settings:', err)
+            alert('บันทึกผิดพลาด: ' + err.message)
+        } finally {
+            setSaving(false)
+        }
+    }
+
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center p-20">
+                <Loader2 className="w-8 h-8 text-amber-500 animate-spin" />
+            </div>
+        )
     }
 
     return (
@@ -90,8 +127,9 @@ export default function AdminSettings() {
                     <h1 className="text-xl font-bold text-slate-800">ตั้งค่าเว็บไซต์</h1>
                     <p className="text-sm text-slate-400 mt-0.5">จัดการข้อมูลและการแสดงผลของเว็บไซต์</p>
                 </div>
-                <Button onClick={handleSave} className="bg-amber-500 hover:bg-amber-600 text-white gap-2 h-9 text-sm shadow shadow-amber-500/20">
-                    <Save className="w-4 h-4" /> บันทึกการตั้งค่า
+                <Button onClick={handleSave} disabled={saving} className="bg-amber-500 hover:bg-amber-600 text-white gap-2 h-9 text-sm shadow shadow-amber-500/20">
+                    {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                    {saving ? 'กำลังบันทึก...' : 'บันทึกการตั้งค่า'}
                 </Button>
             </div>
 
@@ -207,8 +245,9 @@ export default function AdminSettings() {
                 <Button variant="ghost" className="text-slate-400 hover:text-slate-600 gap-2 text-sm">
                     <RefreshCw className="w-4 h-4" /> คืนค่าเริ่มต้น
                 </Button>
-                <Button onClick={handleSave} className="bg-amber-500 hover:bg-amber-600 text-white gap-2 h-9 text-sm shadow shadow-amber-500/20">
-                    <Save className="w-4 h-4" /> บันทึกการตั้งค่า
+                <Button onClick={handleSave} disabled={saving} className="bg-amber-500 hover:bg-amber-600 text-white gap-2 h-9 text-sm shadow shadow-amber-500/20">
+                    {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                    {saving ? 'กำลังบันทึก...' : 'บันทึกการตั้งค่า'}
                 </Button>
             </div>
 

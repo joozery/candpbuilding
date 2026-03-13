@@ -24,11 +24,26 @@ router.get('/:id', asyncHandler(async (req, res) => {
 
 // ---- POST /api/portfolio ---- //
 router.post('/', uploadMiddleware.array('images', 10), asyncHandler(async (req, res) => {
-    const { title, location, year, category, status, description } = req.body
+    const { title, category } = req.body
+    if (!title || !category) {
+        res.status(400)
+        throw new Error('กรุณาระบุชื่อโครงการและหมวดหมู่')
+    }
+
+    const { location, year, status, description } = req.body
     const images = req.files?.length
         ? await uploadManyToCloudinary(req.files, 'portfolio')
         : []
-    const item = await Portfolio.create({ title, location, year, category, status, description, images })
+
+    const item = await Portfolio.create({
+        title,
+        location,
+        year,
+        category,
+        status: status || 'active',
+        description,
+        images
+    })
     res.status(201).json(item)
 }))
 
@@ -37,14 +52,44 @@ router.put('/:id', uploadMiddleware.array('images', 10), asyncHandler(async (req
     const item = await Portfolio.findById(req.params.id)
     if (!item) return res.status(404).json({ message: 'ไม่พบผลงาน' })
 
-    const { title, location, year, category, status, description } = req.body
-    Object.assign(item, { title, location, year, category, status, description })
+    const { title, location, year, category, status, description, remainingImages } = req.body
 
-    if (req.files && req.files.length > 0) {
-        for (const img of item.images) await deleteImage(img.publicId)
-        item.images = await uploadManyToCloudinary(req.files, 'portfolio')
+    // 1. Update text fields
+    if (title) item.title = title
+    if (category) item.category = category
+    item.location = location || item.location
+    item.year = year || item.year
+    item.status = status || item.status
+    item.description = description || item.description
+
+    // 2. Handle Images
+    let finalImages = []
+
+    // If remainingImages is provided, filter out the ones we delete from Cloudinary
+    if (remainingImages) {
+        const keep = JSON.parse(remainingImages) // Array of objects {url, publicId}
+        const keepPublicIds = keep.map(img => img.publicId)
+
+        // Delete images that are NOT in the keep list
+        for (const img of item.images) {
+            if (!keepPublicIds.includes(img.publicId)) {
+                await deleteImage(img.publicId)
+            }
+        }
+        finalImages = keep
+    } else {
+        // If remainingImages is not sent, we assume we keep current ones unless NEW files are uploaded?
+        // Actually it's safer to always send the state from frontend.
+        finalImages = item.images
     }
 
+    // Add new uploads if any
+    if (req.files && req.files.length > 0) {
+        const newUploads = await uploadManyToCloudinary(req.files, 'portfolio')
+        finalImages = [...finalImages, ...newUploads]
+    }
+
+    item.images = finalImages
     await item.save()
     res.json(item)
 }))

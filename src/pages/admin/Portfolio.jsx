@@ -30,8 +30,11 @@ const EMPTY_FORM = {
 // ---- Modal ---- //
 function PortfolioModal({ item, onClose, onSave, saving }) {
     const [form, setForm] = useState(EMPTY_FORM)
-    const [imageFiles, setImageFiles] = useState([])
-    const [previews, setPreviews] = useState([])
+    // สำหรับรูปภาพ
+    const [existingImages, setExistingImages] = useState([]) // รูปที่มีอยู่แล้วบน server
+    const [newFiles, setNewFiles] = useState([]) // ไฟล์ที่เลือกใหม่
+    const [previews, setPreviews] = useState([]) // สำหรับแสดงผล (มัดรวม)
+    
     const fileInputRef = useRef(null)
 
     useEffect(() => {
@@ -44,12 +47,14 @@ function PortfolioModal({ item, onClose, onSave, saving }) {
                 status: item.status || 'active',
                 description: item.description || ''
             })
-            setPreviews(item.images?.map(img => img.url) || [])
+            setExistingImages(item.images || [])
+            setPreviews(item.images?.map(img => ({ url: img.url, isExisting: true, publicId: img.publicId })) || [])
         } else {
             setForm(EMPTY_FORM)
+            setExistingImages([])
             setPreviews([])
         }
-        setImageFiles([])
+        setNewFiles([])
     }, [item])
 
     const handleChange = (k, v) => setForm(p => ({ ...p, [k]: v }))
@@ -57,12 +62,12 @@ function PortfolioModal({ item, onClose, onSave, saving }) {
     const handleImageChange = (e) => {
         const files = Array.from(e.target.files)
         if (files.length > 0) {
-            setImageFiles(prev => [...prev, ...files])
+            setNewFiles(prev => [...prev, ...files])
 
             files.forEach(file => {
                 const reader = new FileReader()
                 reader.onloadend = () => {
-                    setPreviews(prev => [...prev, reader.result])
+                    setPreviews(prev => [...prev, { url: reader.result, isExisting: false, file }])
                 }
                 reader.readAsDataURL(file)
             })
@@ -70,14 +75,18 @@ function PortfolioModal({ item, onClose, onSave, saving }) {
     }
 
     const removePreview = (index) => {
+        const target = previews[index]
+        if (target.isExisting) {
+            setExistingImages(prev => prev.filter(img => img.publicId !== target.publicId))
+        } else {
+            setNewFiles(prev => prev.filter(f => f !== target.file))
+        }
         setPreviews(prev => prev.filter((_, i) => i !== index))
-        // Note: If it was an existing image from server, we might need special handling, 
-        // but for now, if user uploads new files, they replace the whole set on save in current API design.
     }
 
     const handleSaveClick = () => {
         if (!form.title.trim()) return alert('กรุณากรอกชื่อโครงการ')
-        onSave(form, imageFiles)
+        onSave(form, newFiles, existingImages)
     }
 
     return (
@@ -97,9 +106,9 @@ function PortfolioModal({ item, onClose, onSave, saving }) {
                     <div>
                         <Label className="text-xs font-semibold text-slate-600 mb-2 block">รูปภาพผลงาน (เลือกได้หลายรูป)</Label>
                         <div className="grid grid-cols-4 gap-2">
-                            {previews.map((url, idx) => (
+                            {previews.map((p, idx) => (
                                 <div key={idx} className="relative aspect-square rounded-lg overflow-hidden border border-slate-200 group">
-                                    <img src={url} alt="Preview" className="w-full h-full object-cover" />
+                                    <img src={p.url} alt="Preview" className="w-full h-full object-cover" />
                                     <button
                                         onClick={() => removePreview(idx)}
                                         className="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity transform hover:scale-110"
@@ -271,12 +280,19 @@ export default function AdminPortfolio() {
 
     const filtered = items.filter(i => i.title.toLowerCase().includes(search.toLowerCase()))
 
-    const handleSave = async (formData, images) => {
+    const handleSave = async (formData, newFiles, existingImages) => {
         setSaving(true)
         try {
             const fd = new FormData()
             Object.entries(formData).forEach(([k, v]) => fd.append(k, v))
-            images.forEach(img => fd.append('images', img))
+            
+            // ส่งเฉพาะรูปที่เลือกใหม่
+            newFiles.forEach(img => fd.append('images', img))
+            
+            // ส่งข้อมูลรูปเก่าที่จะเหลืออยู่ (เฉพาะตอนแก้ไข)
+            if (modal !== 'add') {
+                fd.append('remainingImages', JSON.stringify(existingImages))
+            }
 
             if (modal === 'add') {
                 await portfolioApi.create(fd)

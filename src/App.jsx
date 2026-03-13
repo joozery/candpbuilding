@@ -22,6 +22,7 @@ import AdminGallery from './pages/admin/Gallery'
 import AdminSettings from './pages/admin/Settings'
 import AdminInquiries from './pages/admin/Inquiries'
 import AdminUsers from './pages/admin/Users'
+import AdminHeroSettings from './pages/admin/HeroSettings'
 
 function App() {
   return (
@@ -49,6 +50,7 @@ function App() {
         <Route path="/admin/settings" element={<ProtectedRoute><AdminLayout><AdminSettings /></AdminLayout></ProtectedRoute>} />
         <Route path="/admin/inquiries" element={<ProtectedRoute><AdminLayout><AdminInquiries /></AdminLayout></ProtectedRoute>} />
         <Route path="/admin/users" element={<ProtectedRoute><AdminLayout><AdminUsers /></AdminLayout></ProtectedRoute>} />
+        <Route path="/admin/hero" element={<ProtectedRoute><AdminLayout><AdminHeroSettings /></AdminLayout></ProtectedRoute>} />
 
         {/* Helper Redirects */}
         <Route path="/admin/dashboard" element={<Navigate to="/admin" replace />} />

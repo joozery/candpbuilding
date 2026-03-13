@@ -3,8 +3,27 @@ import { Link } from 'react-router-dom'
 import { ChevronDown } from 'lucide-react'
 import { motion } from 'framer-motion'
 import heroBg from '../assets/herobg.jpg'
+import { settingsApi } from '../lib/api'
+import { useEffect, useState } from 'react'
 
 const Hero = () => {
+  const [heroImageUrl, setHeroImageUrl] = useState('')
+  const [heroTitle, setHeroTitle] = useState('')
+  const [heroSubtitle, setHeroSubtitle] = useState('')
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const data = await settingsApi.get()
+        if (data.heroImageUrl) setHeroImageUrl(data.heroImageUrl)
+        if (data.heroTitle) setHeroTitle(data.heroTitle)
+        if (data.heroSubtitle) setHeroSubtitle(data.heroSubtitle)
+      } catch (err) {
+        console.error('Failed to fetch Hero settings:', err)
+      }
+    }
+    fetchSettings()
+  }, [])
 
   const scrollToSection = (sectionId) => {
     const element = document.getElementById(sectionId)
@@ -41,7 +60,7 @@ const Hero = () => {
       id="hero"
       className="relative min-h-screen flex items-center justify-center overflow-hidden"
       style={{
-        backgroundImage: `url(${heroBg})`,
+        backgroundImage: `url(${heroImageUrl || heroBg})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat'
@@ -96,19 +115,22 @@ const Hero = () => {
             variants={itemVariants}
             className="text-4xl md:text-6xl lg:text-7xl font-bold leading-tight"
           >
-            สร้าง<span className="text-primary-400">อาคาร</span>
-            <br />
-            ที่คุณต้องการ
-            <br />
-            <span className="text-primary-400">ให้เป็นจริง</span>
+            {heroTitle || (
+              <>
+                สร้าง<span className="text-primary-400">อาคาร</span>
+                <br />
+                ที่คุณต้องการ
+                <br />
+                <span className="text-primary-400">ให้เป็นจริง</span>
+              </>
+            )}
           </motion.h1>
 
           <motion.p
             variants={itemVariants}
             className="text-lg md:text-xl leading-relaxed text-gray-300 max-w-lg"
           >
-            C&P Building Houses คือผู้เชี่ยวชาญด้านการก่อสร้างและสถาปัตยกรรม
-            ที่มีความรับผิดชิดเป็นมิตรกับสิ่งแวดล้อมมากที่สุดสำหรับทุกรูปแบบโครงการ
+            {heroSubtitle || 'C&P Building Houses คือผู้เชี่ยวชาญด้านการก่อสร้างและสถาปัตยกรรม ที่มีความรับผิดชิดเป็นมิตรกับสิ่งแวดล้อมมากที่สุดสำหรับทุกรูปแบบโครงการ'}
           </motion.p>
 
           <motion.div

@@ -76,3 +76,9 @@ export const usersApi = {
     create: (data) => apiFetch('/users', { method: 'POST', body: JSON.stringify(data) }),
     delete: (id) => apiFetch(`/users/${id}`, { method: 'DELETE' }),
 }
+
+// ===================== SETTINGS ===================== //
+export const settingsApi = {
+    get: () => apiFetch('/settings'),
+    update: (data) => apiFetch('/settings', { method: 'PUT', body: JSON.stringify(data) }),
+}
