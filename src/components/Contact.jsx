@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
-import { MapPin, Phone, Mail, Clock, Send, CheckCircle, AlertCircle } from 'lucide-react'
+import { MapPin, Phone, Mail, Clock, Send, CheckCircle, AlertCircle, MessageCircle } from 'lucide-react'
 import { contactsApi, settingsApi } from '../lib/api'
 import { useEffect } from 'react'
 
@@ -39,18 +39,24 @@ const Contact = () => {
     {
       icon: <MapPin className="w-6 h-6" />,
       title: 'ที่อยู่',
-      content: settings?.address || '123 ถนนสุขุมวิท แขวงคลองเตย\nเขตคลองเตย กรุงเทพฯ 10110'
+      content: settings?.address || '781/45 ชั้นที่ 8 ห้องเลขที่ 3A8 หมู่บ้าน ปัญญารีสอร์ท หมู่ที่ 10 ตำบลบางพระ อำเภอศรีราชา จ.ชลบุรี'
     },
     {
       icon: <Phone className="w-6 h-6" />,
       title: 'โทรศัพท์',
-      content: settings?.phone || '02-123-4567\n086-123-4567'
+      content: settings?.phone || '02-123-4567'
     },
     {
       icon: <Mail className="w-6 h-6" />,
       title: 'อีเมล',
-      content: settings?.email || 'info@cpbuildinghouse.com\ncontact@cpbuildinghouse.com'
+      content: settings?.email || 'info@cpbuildinghouse.com'
     },
+    ...(settings?.lineUrl ? [{
+      icon: <MessageCircle className="w-6 h-6" />,
+      title: 'LINE',
+      content: 'คลิกเพื่อแอดไลน์',
+      href: settings.lineUrl
+    }] : []),
     {
       icon: <Clock className="w-6 h-6" />,
       title: 'เวลาทำการ',
@@ -159,9 +165,15 @@ const Contact = () => {
                   <h4 className="text-lg font-semibold text-secondary-800 mb-2">
                     {info.title}
                   </h4>
-                  <p className="text-secondary-600 leading-relaxed whitespace-pre-line">
-                    {info.content}
-                  </p>
+                  {info.href ? (
+                    <a href={info.href} target="_blank" rel="noopener noreferrer" className="text-primary-600 font-medium hover:underline">
+                      {info.content}
+                    </a>
+                  ) : (
+                    <p className="text-secondary-600 leading-relaxed whitespace-pre-line">
+                      {info.content}
+                    </p>
+                  )}
                 </div>
               </motion.div>
             ))}

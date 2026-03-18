@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Globe, MessageCircle, Camera, Phone, Mail, MapPin, Send } from 'lucide-react'
+import { Globe, MessageCircle, Camera, Phone, Mail, MapPin, Send, Facebook, Youtube } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { settingsApi } from '../lib/api'
 import { useEffect } from 'react'
@@ -24,21 +24,21 @@ const Footer = () => {
   }, [])
 
   const socialLinks = [
-    {
-      icon: <Globe className="w-5 h-5" />,
-      href: "#",
+    ...(settings?.facebookUrl ? [{
+      icon: <Facebook className="w-5 h-5" />,
+      href: settings.facebookUrl,
       label: "Facebook"
-    },
-    {
+    }] : []),
+    ...(settings?.lineUrl ? [{
       icon: <MessageCircle className="w-5 h-5" />,
-      href: "#",
+      href: settings.lineUrl,
       label: "LINE"
-    },
-    {
-      icon: <Camera className="w-5 h-5" />,
-      href: "#",
-      label: "Instagram"
-    }
+    }] : []),
+    ...(settings?.youtubeUrl ? [{
+      icon: <Youtube className="w-5 h-5" />,
+      href: settings.youtubeUrl,
+      label: "YouTube"
+    }] : [])
   ]
 
   const quickLinks = [

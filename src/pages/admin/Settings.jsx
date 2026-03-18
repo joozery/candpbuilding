@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Save, Globe, Phone, Mail, MapPin, Facebook, Youtube, Building2, RefreshCw, Loader2, Image as ImageIcon, Upload, X } from 'lucide-react'
+import { Save, Globe, Phone, Mail, MapPin, Facebook, Youtube, Building2, RefreshCw, Loader2, Image as ImageIcon, Upload, X, MessageSquare } from 'lucide-react'
 import { settingsApi, uploadApi } from '@/lib/api'
 
 // ---- Section Wrapper ---- //
@@ -196,6 +196,14 @@ export default function AdminSettings() {
                         <Youtube className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-red-500" />
                         <Input id="yt" value={settings.youtubeUrl} onChange={e => set('youtubeUrl', e.target.value)}
                             placeholder="https://youtube.com/..."
+                            className="pl-9 border-slate-200 text-sm focus:border-amber-400" />
+                    </div>
+                </Field>
+                <Field label="LINE" id="line">
+                    <div className="relative">
+                        <MessageSquare className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500" />
+                        <Input id="line" value={settings.lineUrl} onChange={e => set('lineUrl', e.target.value)}
+                            placeholder="https://line.me/ti/p/..."
                             className="pl-9 border-slate-200 text-sm focus:border-amber-400" />
                     </div>
                 </Field>
