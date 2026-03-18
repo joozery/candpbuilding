@@ -23,7 +23,7 @@ router.get('/:id', asyncHandler(async (req, res) => {
 }))
 
 // ---- POST /api/portfolio ---- //
-router.post('/', uploadMiddleware.array('images', 10), asyncHandler(async (req, res) => {
+router.post('/', uploadMiddleware.array('images', 50), asyncHandler(async (req, res) => {
     const { title, category } = req.body
     if (!title || !category) {
         res.status(400)
@@ -48,7 +48,7 @@ router.post('/', uploadMiddleware.array('images', 10), asyncHandler(async (req, 
 }))
 
 // ---- PUT /api/portfolio/:id ---- //
-router.put('/:id', uploadMiddleware.array('images', 10), asyncHandler(async (req, res) => {
+router.put('/:id', uploadMiddleware.array('images', 50), asyncHandler(async (req, res) => {
     const item = await Portfolio.findById(req.params.id)
     if (!item) return res.status(404).json({ message: 'ไม่พบผลงาน' })
 

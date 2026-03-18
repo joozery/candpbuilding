@@ -4,6 +4,7 @@
  */
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
+console.log('API BASE_URL Loaded:', BASE_URL);
 
 // ---- Generic fetch ---- //
 async function apiFetch(path, options = {}) {
